@@ -1,22 +1,20 @@
 #pragma once
 #include <cmath>
 #include <utility>
+#include <numeric>
 
 namespace sfinx {
 
-template <typename Ret, typename T, typename U, typename F, typename Acc>
-Ret sigma_func(Ret init, T const& t, U const& u, F f, Acc acc)
+template <typename Ret, typename T, typename U, typename Prod, typename Accum>
+Ret inner_product(Ret init, T const& t, U const& u, Prod prod, Accum accum)
 {
-  using namespace std;
-  for (auto i = begin(t), j = begin(u); i != end(t) && j != end(u); ++i, ++j)
-    init = acc(init, f(*i, *j));
-  return init;
+  return std::inner_product(std::begin(t), std::end(t), std::begin(u), init, accum, prod);
 }
 
-template <typename Ret, typename T, typename U, typename F>
-Ret sigma_func(Ret init, T const& t, U const& u, F f)
+template <typename Ret, typename T, typename U, typename Prod>
+Ret inner_product(Ret init, T const& t, U const& u, Prod prod)
 {
-  return sigma_func(init, t, u, f, std::plus<Ret>());
+  return inner_product(init, t, u, prod, std::plus<Ret>());
 }
 
 template <typename Ret, typename X, typename Y>

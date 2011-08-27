@@ -6,3 +6,6 @@ Features:
 2. Maximum reusability through generic and functional design
 3. Toolbox, not framework, less object-oriented
 
+// Thoughts
+Should discrete/continuous namespace, instead of function tag?
+

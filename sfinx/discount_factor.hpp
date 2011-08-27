@@ -1,11 +1,13 @@
 #pragma once
 #include <cmath>
+#include <type_traits>
 
 namespace sfinx {
 
-double discount_factor(double rate, double t)
+template <typename T>
+T discount_factor(T rate, T t, size_t n = 0)
 {
-  return exp(-rate * t);
+  return (n == 0) ? exp(-rate * t) : pow(1 + rate / n, -(n * t));
 }
 
 double yield(double discount_factor, double t)
@@ -14,12 +16,6 @@ double yield(double discount_factor, double t)
 }
 
 /*
-template <typename T>
-T discount_factor(T r, T t)
-{
-  return exp(-r * t);
-}
-
 template <typename T>
 T yield(T discount_factor, T t)
 {
