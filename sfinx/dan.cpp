@@ -8,6 +8,9 @@
 #include "bisect.hpp"
 #include "irr.hpp"
 #include "bond.hpp"
+#include "black_scholes.hpp"
+#include "term_structure.hpp"
+
 
 using namespace sfinx;
 
@@ -22,6 +25,30 @@ TEST(sfinx, linear_interpolate)
   EXPECT_LT(fabs(linear_interpolate(1.7, xs, ys).first - 3.4), eps); 
   EXPECT_LT(fabs(linear_interpolate(2.0, xs, ys).first - 4.0), eps); 
   EXPECT_FALSE(linear_interpolate(2.1, xs, ys).second);
+}
+
+TEST(sfinx, erfc)
+{
+  double eps = 1.0e-15;
+  EXPECT_LT(fabs(erfc(-1.0) - 1.8427007929497148), eps);
+  EXPECT_LT(fabs(erfc(0) - 1), eps);
+  EXPECT_LT(fabs(erfc(2) - 0.004677734981047265), eps);
+}
+
+TEST(sfinx, normal_pdf)
+{
+  double eps = 1.0e-6;
+  EXPECT_LT(fabs(normal_pdf(0) - 0.398942), eps);
+  EXPECT_LT(fabs(normal_pdf(1) - 0.241971), eps);
+  EXPECT_LT(fabs(normal_pdf(2) - 0.053991), eps);
+}
+
+TEST(sfinx, normal_cdf)
+{
+  double eps = 1.0e-4;
+  EXPECT_LT(fabs(normal_cdf(-1) - 0.1587), eps);
+  EXPECT_LT(fabs(normal_cdf(0) - 0.5), eps);
+  EXPECT_LT(fabs(normal_cdf(2) - 0.9772), eps);
 }
 
 TEST(sfinx, discount_factor)
@@ -126,5 +153,27 @@ TEST(sfinx, bond_convexity)
   double amounts[] = { 10.0, 10.0, 110.0 };
   EXPECT_LT(fabs(bond_convexity<Flow::Discrete>(times, amounts, 0.09) - 8.93248), eps);
   EXPECT_LT(fabs(bond_convexity<Flow::Continuous>(times, amounts, 0.09) - 7.86779), eps);
+}
+
+TEST(sfinx, black_scholes)
+{
+  using namespace sfinx::option;
+  double S = 45, K = 50, T = 0.50, r = 0.01, v = 0.20;
+  double eps = 1.0e-4;
+  EXPECT_LT(fabs(black_scholes<call>(S, K, T, r, v) - 0.9392), eps);
+  EXPECT_LT(fabs(black_scholes<put>(S, K, T, r, v) - 5.6898), eps);
+  EXPECT_LT(fabs(delta<call>(S, K, T, r, v) - 0.2615), eps);
+  EXPECT_LT(fabs(delta<put>(S, K, T, r, v) - -0.7385), eps);
+  EXPECT_LT(fabs(gamma(S, K, T, r, v) - 0.051), eps);
+  EXPECT_LT(fabs(vega(S, K, T, r, v) - 10.372), eps);
+  EXPECT_LT(fabs(theta<call>(S, K, T, r, v) - -2.177), eps);
+}
+
+TEST(sfinx, nelson_siegel)
+{
+  using namespace sfinx::term_structure;
+  double eps = 1.0e-7;
+  double b0 = 0.01, b1 = 0.01, b2 = 0.01, lambda = 5.0, t = 1;
+  EXPECT_LT(fabs(nelson_siegel(t, b0, b1, b2, lambda) - 0.0363142), eps);
 }
 
