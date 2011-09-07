@@ -10,6 +10,7 @@
 #include "bond.hpp"
 #include "black_scholes.hpp"
 #include "term_structure.hpp"
+#include "interest_rate.hpp"
 
 
 using namespace sfinx;
@@ -175,5 +176,13 @@ TEST(sfinx, nelson_siegel)
   double eps = 1.0e-7;
   double b0 = 0.01, b1 = 0.01, b2 = 0.01, lambda = 5.0, t = 1;
   EXPECT_LT(fabs(nelson_siegel(t, b0, b1, b2, lambda) - 0.0363142), eps);
+}
+
+TEST(sfinx, vasicek)
+{
+  using namespace sfinx::interest_rate;
+  double eps = 1.0e-6;
+  double t = 1, r0 = 0.05, a = -0.1, b = 0.1, sigma = 0.1;
+  EXPECT_LT(fabs(vasicek(t, r0, a, b, sigma) - 0.955408), eps);
 }
 
