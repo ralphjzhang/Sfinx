@@ -161,13 +161,13 @@ TEST(sfinx, black_scholes)
   using namespace sfinx::option;
   double S = 45, K = 50, T = 0.50, r = 0.01, v = 0.20;
   double eps = 1.0e-4;
-  EXPECT_LT(fabs(black_scholes<call>(S, K, T, r, v) - 0.9392), eps);
-  EXPECT_LT(fabs(black_scholes<put>(S, K, T, r, v) - 5.6898), eps);
-  EXPECT_LT(fabs(delta<call>(S, K, T, r, v) - 0.2615), eps);
-  EXPECT_LT(fabs(delta<put>(S, K, T, r, v) - -0.7385), eps);
+  EXPECT_LT(fabs(black_scholes<Type::Call>(S, K, T, r, v) - 0.9392), eps);
+  EXPECT_LT(fabs(black_scholes<Type::Put>(S, K, T, r, v) - 5.6898), eps);
+  EXPECT_LT(fabs(delta<Type::Call>(S, K, T, r, v) - 0.2615), eps);
+  EXPECT_LT(fabs(delta<Type::Put>(S, K, T, r, v) - -0.7385), eps);
   EXPECT_LT(fabs(gamma(S, K, T, r, v) - 0.051), eps);
   EXPECT_LT(fabs(vega(S, K, T, r, v) - 10.372), eps);
-  EXPECT_LT(fabs(theta<call>(S, K, T, r, v) - -2.177), eps);
+  EXPECT_LT(fabs(theta<Type::Call>(S, K, T, r, v) - -2.177), eps);
 }
 
 TEST(sfinx, nelson_siegel)

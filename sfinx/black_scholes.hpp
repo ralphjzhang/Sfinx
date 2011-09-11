@@ -3,11 +3,7 @@
 #include <cmath>
 #include "math.hpp"
 
-namespace sfinx {
-
-//enum class Option
-
-namespace option {
+namespace sfinx { namespace option {
 
 namespace aux {
 
@@ -45,55 +41,60 @@ inline double put(double d1, double d2, double S, double K, double T, double r)
 
 } // namespace aux
 
+enum class Type 
+{
+  Call, Put, Both
+};
 
-struct call { };
-struct put { };
-struct both { };
+enum class Exercise
+{
+  European, American
+};
 
-template <typename Option = both>
+template <Type type = Type::Both>
 auto black_scholes(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<std::is_same<Option, both>::value, std::pair<double, double>>::type
+  -> typename std::enable_if<type == Type::Both, std::pair<double, double>>::type
 {
   auto d = aux::d(S, K, T, r, v);
   double call = aux::call(d.first, d.second, S, K, T, r), put = aux::put(d.first, d.second, S, K, T, r);
   return std::make_pair(call, put);
 }
 
-template <typename Option>
+template <Type type>
 auto black_scholes(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<std::is_same<Option, call>::value, double>::type
+  -> typename std::enable_if<type == Type::Call, double>::type
 {
   auto d = aux::d(S, K, T, r, v);
   return aux::call(d.first, d.second, S, K, T, r);
 }
 
-template <typename Option>
+template <Type type>
 auto black_scholes(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<std::is_same<Option, put>::value, double>::type
+  -> typename std::enable_if<type == Type::Put, double>::type
 {
   auto d = aux::d(S, K, T, r, v);
   return aux::put(d.first, d.second, S, K, T, r);
 }
 
-template <typename Option>
+template <Type type>
 auto delta(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<std::is_same<Option, call>::value, double>::type
+  -> typename std::enable_if<type == Type::Call, double>::type
 {
   return normal_cdf(aux::d1(S, K, T, r, v));
 }
 
-template <typename Option>
+template <Type type>
 auto delta(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<std::is_same<Option, put>::value, double>::type
+  -> typename std::enable_if<type == Type::Put, double>::type
 {
   return normal_cdf(aux::d1(S, K, T, r, v)) - 1;
 }
 
-template <typename Option>
+template <Type type>
 auto delta(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<std::is_same<Option, both>::value, std::pair<double, double>>::type
+  -> typename std::enable_if<type == Type::Both, std::pair<double, double>>::type
 {
-  double d = delta<call>(S, K, T, r, v);
+  double d = delta<Type::Call>(S, K, T, r, v);
   return std::make_pair(d, d - 1);
 }
 
@@ -107,27 +108,27 @@ inline double vega(double S, double K, double T, double r, double v)
   return S * normal_pdf(aux::d1(S, K, T, r, v)) * sqrt(T);
 }
 
-template <typename Option>
+template <Type type>
 auto theta(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<std::is_same<Option, call>::value, double>::type
+  -> typename std::enable_if<type == Type::Call, double>::type
 {
   double d1 = aux::d1(S, K, T, r, v);
   double d2 = aux::d2(d1, T, v);
   return -S * normal_pdf(d1) * v / (2 * T) - r * K * exp(-r * T) * normal_cdf(d2);
 }
 
-template <typename Option>
+template <Type type>
 auto theta(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<std::is_same<Option, put>::value, double>::type
+  -> typename std::enable_if<type == Type::Put, double>::type
 {
   double d1 = aux::d1(S, K, T, r, v);
   double d2 = aux::d2(d1, T, v);
   return -S * normal_pdf(d1) * v / (2 * T) - r * K * exp(-r * T) * normal_cdf(-d2);
 }
 
-template <typename Option>
+template <Type type>
 auto theta(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<std::is_same<Option, both>::value, std::pair<double, double>>::type
+  -> typename std::enable_if<type == Type::Both, std::pair<double, double>>::type
 {
   double d1 = aux::d1(S, K, T, r, v);
   double d2 = aux::d2(d1, T, v);
@@ -135,23 +136,23 @@ auto theta(double S, double K, double T, double r, double v)
   return std::make_pair(t1 - t2 * normal_cdf(d2), t1 - t2 * normal_cdf(-d2));
 }
 
-template <typename Option>
+template <Type type>
 auto rho(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<std::is_same<Option, call>::value, double>::type
+  -> typename std::enable_if<type == Type::Call, double>::type
 {
   return K * T * exp(-r * T) * normal_cdf(aux::d2(S, K, T, r, v));
 }
 
-template <typename Option>
+template <Type type>
 auto rho(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<std::is_same<Option, put>::value, double>::type
+  -> typename std::enable_if<type == Type::Put, double>::type
 {
   return -K * T * exp(-r * T) * normal_cdf(-aux::d2(S, K, T, r, v));
 }
 
-template <typename Option>
+template <Type type>
 auto rho(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<std::is_same<Option, both>::value, std::pair<double, double>>::type
+  -> typename std::enable_if<type == Type::Both, std::pair<double, double>>::type
 {
   double d2 = aux::d2(S, K, T, r, v);
   double t = K * T * exp(-r * T);
@@ -159,6 +160,5 @@ auto rho(double S, double K, double T, double r, double v)
 }
 
 } // namespace option
-
 } // namespace sfinx
 
