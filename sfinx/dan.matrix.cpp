@@ -49,3 +49,11 @@ TEST(matrix, transpose)
   }
 }
 
+TEST(matrix, inverse)
+{
+  Matrix<float, 2, 2> m, mr;
+  m << 5, 4, 6, 5;
+  mr << 5, -4, -6, 5;
+  EXPECT_TRUE(mr == inverse(m));
+}
+

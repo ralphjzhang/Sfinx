@@ -3,7 +3,7 @@
 namespace sfinx { namespace matrix {
 
 /**
- * Meta functions, for type extraction, etc.
+ * Meta functions, for type computation, etc.
  */
 
 template <typename Mx>
@@ -16,39 +16,25 @@ struct vector_type;
 
 /// row_type<Mx>
 //
-template <typename Mx>
-struct row_type;
-
 template <template <typename T, int rows, int cols, int, int, int> class Mx,
           typename T, int rows, int cols, int options, int maxrows, int maxcols>
-struct row_type<Mx<T, rows, cols, options, maxrows, maxcols>>
-{
-  typedef Mx<T, 1, cols, !options, 1, maxcols> type;
-};
+auto row_type(Mx<T, rows, cols, options, maxrows, maxcols>)
+  -> Mx<T, 1, cols, !options, 1, maxcols>;
+                  //TODO !options changes col-major to row-major, but should be a better way
 
-/// col_type<Mx>
+/// col_type(Mx)
 //
-template <typename Mx>
-struct col_type;
-
 template <template <typename T, int rows, int cols, int, int, int> class Mx,
           typename T, int rows, int cols, int options, int maxrows, int maxcols>
-struct col_type<Mx<T, rows, cols, options, maxrows, maxcols>>
-{
-  typedef Mx<T, rows, 1, options, maxrows, 1> type;
-};
+auto col_type(Mx<T, rows, cols, options, maxrows, maxcols>)
+  -> Mx<T, rows, 1, options, maxrows, 1>;
 
 /// transpose_type<Mx>
 //
-template <typename Mx>
-struct transpose_type;
-
 template <template <typename T, int rows, int cols, int, int, int> class Mx,
           typename T, int rows, int cols, int options, int maxrows, int maxcols>
-struct transpose_type<Mx<T, rows, cols, options, maxrows, maxcols>>
-{
-  typedef Mx<T, cols, rows, options, maxcols, maxrows> type;
-};
+auto transpose_type(Mx<T, rows, cols, options, maxrows, maxcols>)
+  -> Mx<T, cols, rows, options, maxcols, maxrows>;
 
 
 } } // namespace sfinx::matrix

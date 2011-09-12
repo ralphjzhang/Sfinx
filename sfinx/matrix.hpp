@@ -25,28 +25,25 @@ inline size_t size(Mx const& m)
 }
 
 template <typename Mx>
-inline auto row(Mx const& m, size_t n)
-  -> typename row_type<Mx>::type
+inline auto row(Mx const& m, size_t n) -> decltype(row_type(m))
 {
   return m.row(n);
 }
 
 template <typename Mx>
-inline auto col(Mx const& m, size_t n)
-  -> typename col_type<Mx>::type
+inline auto col(Mx const& m, size_t n) -> decltype(col_type(m))
 {
   return m.col(n);
 }
 
 template <typename Mx>
-inline auto transpose(Mx const& m)
-  -> typename transpose_type<Mx>::type
+inline auto transpose(Mx const& m) -> decltype(transpose_type(m))
 {
   return m.transpose();
 }
 
 template <typename Mx>
-inline size_t inverse(Mx const& m)
+inline Mx inverse(Mx const& m)
 {
   return m.inverse();
 }

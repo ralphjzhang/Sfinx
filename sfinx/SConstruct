@@ -1,11 +1,10 @@
 import os
 
 home = os.environ['HOME']
-KUDIR = home + '/Dropbox/Code/Ku/'
-INCDIR = ' -I' + KUDIR
-INCDIR += ' -I' + home + '/Dropbox/Code/Sfinx/eigen-3.0.1'
+kudir = home + '/Dropbox/Code/Ku/'
+eigendir = home + '/Dropbox/Code/Sfinx/eigen-3.0.1'
 
-Program('dan', Glob('*.cpp') + [KUDIR + 'gtest/gtest_main.a'], 
-    LIBS = ['pthread', 'dl', 'm'],
-    CCFLAGS = '-Wall --std=c++0x -fPIC -rdynamic' + INCDIR
+env = Environment(CPPPATH = [kudir, eigendir], CCFLAGS = '-Wall --std=c++0x -fPIC -rdynamic')
+env.Program('dan', Glob('*.cpp') + [kudir + 'gtest/gtest_main.a'], 
+    LIBS = ['pthread', 'dl', 'm']
     )
