@@ -6,15 +6,18 @@ namespace sfinx { namespace matrix {
  * Meta functions, for type computation, etc.
  */
 
-template <typename Mx>
-struct scalar_type;
+/// scalar_type(Mx)
+//
+template <template <typename T, int rows, int cols, int, int, int> class Mx,
+          typename T, int rows, int cols, int options, int maxrows, int maxcols>
+T scalar_type(Mx<T, rows, cols, options, maxrows, maxcols>);
 
 /// vector_type<Mx>
 //
 template <typename Mx>
 struct vector_type;
 
-/// row_type<Mx>
+/// row_type(Mx)
 //
 template <template <typename T, int rows, int cols, int, int, int> class Mx,
           typename T, int rows, int cols, int options, int maxrows, int maxcols>
@@ -29,7 +32,7 @@ template <template <typename T, int rows, int cols, int, int, int> class Mx,
 auto col_type(Mx<T, rows, cols, options, maxrows, maxcols>)
   -> Mx<T, rows, 1, options, maxrows, 1>;
 
-/// transpose_type<Mx>
+/// transpose_type(Mx)
 //
 template <template <typename T, int rows, int cols, int, int, int> class Mx,
           typename T, int rows, int cols, int options, int maxrows, int maxcols>

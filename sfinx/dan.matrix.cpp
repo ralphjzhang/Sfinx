@@ -57,3 +57,14 @@ TEST(matrix, inverse)
   EXPECT_TRUE(mr == inverse(m));
 }
 
+TEST(matrix, eigenvalues)
+{
+  Matrix<double, 2, 2> m;
+  m << 1, 2, 2, 1;
+  decltype(eigenvalues(m)) m1;
+  m1 << 3.0, -1.0;
+  auto m2 = eigenvalues(m);
+  EXPECT_LT(fabs(m1(0) - m2(0)), std::numeric_limits<double>::epsilon() * 10);
+  EXPECT_LT(fabs(m1(1) - m2(1)), std::numeric_limits<double>::epsilon() * 10);
+}
+

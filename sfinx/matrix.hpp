@@ -49,10 +49,13 @@ inline Mx inverse(Mx const& m)
 }
 
 template <typename Mx>
-inline auto eigenvalues(Mx const& m)
-  -> std::vector<typename scalar_type<Mx>::type>
+inline auto eigenvalues(Mx const& m) -> decltype(col_type(m))
 {
-  return m.eigenvalues();
+  auto ev = m.eigenvalues();
+  decltype(col_type(m)) ret;
+  for (int i = 0; i < ev.rows(); ++i)
+    ret(i) = ev(i).real();
+  return ret;
 }
 
 template <typename Mx>
