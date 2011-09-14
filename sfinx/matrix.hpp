@@ -59,10 +59,10 @@ inline auto eigenvalues(Mx const& m) -> decltype(col_type(m))
 }
 
 template <typename Mx>
-inline auto eigenvectors(Mx const& m)
-  -> std::vector<typename vector_type<Mx>::type>
+inline auto eigenvectors(Mx const& m) -> Mx
 {
-  return m.eigenvectors();
+  Eigen::SelfAdjointEigenSolver<Mx> solver(m);
+  return solver.eigenvectors();
 }
 
 } // namespace matrix 

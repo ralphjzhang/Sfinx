@@ -114,7 +114,7 @@ auto theta(double S, double K, double T, double r, double v)
 {
   double d1 = aux::d1(S, K, T, r, v);
   double d2 = aux::d2(d1, T, v);
-  return -S * normal_pdf(d1) * v / (2 * T) - r * K * exp(-r * T) * normal_cdf(d2);
+  return -S * normal_pdf(d1) * v / (2 * sqrt(T)) - r * K * exp(-r * T) * normal_cdf(d2);
 }
 
 template <Type type>
@@ -123,7 +123,7 @@ auto theta(double S, double K, double T, double r, double v)
 {
   double d1 = aux::d1(S, K, T, r, v);
   double d2 = aux::d2(d1, T, v);
-  return -S * normal_pdf(d1) * v / (2 * T) - r * K * exp(-r * T) * normal_cdf(-d2);
+  return -S * normal_pdf(d1) * v / (2 * sqrt(T)) + r * K * exp(-r * T) * normal_cdf(-d2);
 }
 
 template <Type type>
@@ -132,8 +132,8 @@ auto theta(double S, double K, double T, double r, double v)
 {
   double d1 = aux::d1(S, K, T, r, v);
   double d2 = aux::d2(d1, T, v);
-  double t1 = -S * normal_pdf(d1) * v / (2 * T), t2 = r * K * exp(-r * T);
-  return std::make_pair(t1 - t2 * normal_cdf(d2), t1 - t2 * normal_cdf(-d2));
+  double t1 = -S * normal_pdf(d1) * v / (2 * sqrt(T)), t2 = r * K * exp(-r * T);
+  return std::make_pair(t1 - t2 * normal_cdf(d2), t1 + t2 * normal_cdf(-d2));
 }
 
 template <Type type>

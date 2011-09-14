@@ -68,3 +68,15 @@ TEST(matrix, eigenvalues)
   EXPECT_LT(fabs(m1(1) - m2(1)), std::numeric_limits<double>::epsilon() * 10);
 }
 
+TEST(matrix, eigenvectors)
+{
+  Matrix<double, 2, 2> m;
+  m << 1, 2, 2, 1;
+  auto m1 = eigenvectors(m);
+  double eps = 1e-6;
+  EXPECT_LT(fabs(m1(0, 0) + 0.707107), eps);
+  EXPECT_LT(fabs(m1(0, 1) + 0.707107), eps);
+  EXPECT_LT(fabs(m1(1, 0) - 0.707107), eps);
+  EXPECT_LT(fabs(m1(1, 1) + 0.707107), eps);
+}
+

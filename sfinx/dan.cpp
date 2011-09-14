@@ -42,6 +42,8 @@ TEST(sfinx, normal_pdf)
   EXPECT_LT(fabs(normal_pdf(0) - 0.398942), eps);
   EXPECT_LT(fabs(normal_pdf(1) - 0.241971), eps);
   EXPECT_LT(fabs(normal_pdf(2) - 0.053991), eps);
+  EXPECT_LT(fabs(normal_pdf(-0.5) - 0.352065), eps);
+  EXPECT_LT(fabs(normal_pdf(-0.1) - 0.396953), eps);
 }
 
 TEST(sfinx, normal_cdf)
@@ -165,9 +167,13 @@ TEST(sfinx, black_scholes)
   EXPECT_LT(fabs(black_scholes<Type::Put>(S, K, T, r, v) - 5.6898), eps);
   EXPECT_LT(fabs(delta<Type::Call>(S, K, T, r, v) - 0.2615), eps);
   EXPECT_LT(fabs(delta<Type::Put>(S, K, T, r, v) - -0.7385), eps);
-  EXPECT_LT(fabs(gamma(S, K, T, r, v) - 0.051), eps);
-  EXPECT_LT(fabs(vega(S, K, T, r, v) - 10.372), eps);
-  EXPECT_LT(fabs(theta<Type::Call>(S, K, T, r, v) - -2.177), eps);
+  EXPECT_LT(fabs(gamma(S, K, T, r, v) - 0.0511), eps);
+
+  EXPECT_LT(fabs(vega(S, K, T, r, v) - 10.3504), eps);
+  EXPECT_LT(fabs(theta<Type::Call>(S, K, T, r, v) - -2.1783), eps);
+  EXPECT_LT(fabs(theta<Type::Put>(S, K, T, r, v) - -1.6809), eps);
+  EXPECT_LT(fabs(rho<Type::Call>(S, K, T, r, v) - 5.4126), eps);
+  EXPECT_LT(fabs(rho<Type::Put>(S, K, T, r, v) - -19.4628), eps);
 }
 
 TEST(sfinx, nelson_siegel)
