@@ -1,11 +1,20 @@
 #pragma once
 #include <vector>
-#include "matrix_meta.hpp"
+#include <Eigen/Dense>
+#include "eigen_meta.hpp"
 
 namespace sfinx { namespace matrix {
 
 /// Functions
 //
+using namespace Eigen;
+
+template <typename T, size_t Rows, size_t Cols>
+auto matrix() -> Matrix<T, Rows, Cols>
+{
+  return Matrix<T, Rows, Cols>();
+}
+
 template <typename Mx>
 inline size_t rows(Mx const& m)
 {
@@ -22,6 +31,12 @@ template <typename Mx>
 inline size_t size(Mx const& m)
 {
   return m.size();
+}
+
+template <typename Mx>
+inline void resize(Mx& m, size_t row, size_t col)
+{
+  m.resize(row, col);
 }
 
 template <typename Mx>

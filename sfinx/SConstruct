@@ -2,9 +2,13 @@ import os
 
 home = os.environ['HOME']
 kudir = home + '/Dropbox/Code/Ku/'
-eigendir = home + '/Dropbox/Code/Sfinx/eigen-3.0.1'
+sfinxdir = home + '/Dropbox/Code/Sfinx/'
+eigendir = sfinxdir + 'eigen-3.0.1'
+newmatdir = sfinxdir + 'newmat10'
 
-env = Environment(CPPPATH = [kudir, eigendir], CCFLAGS = '-Wall --std=c++0x -fPIC -rdynamic')
+env = Environment(CPPPATH = [kudir, eigendir, newmatdir],
+                  LIBPATH = [newmatdir],
+                  CCFLAGS = '-Wall --std=c++0x -fPIC -rdynamic')
 env.Program('dan', Glob('*.cpp') + [kudir + 'gtest/gtest_main.a'], 
-    LIBS = ['pthread', 'dl', 'm']
+    LIBS = ['pthread', 'dl', 'm', 'newmat']
     )

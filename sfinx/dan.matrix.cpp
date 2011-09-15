@@ -1,13 +1,11 @@
 #include <gtest/gtest.h>
-#include <Eigen/Dense>
-#include "matrix.hpp"
+#include "matrix/eigen.hpp"
 
 using namespace sfinx::matrix;
-using namespace Eigen;
 
 TEST(matrix, size)
 {
-  Matrix<int, 2, 3> m;
+  auto m = matrix<int, 2, 3>();
   m << 1, 2, 3, 4, 5, 6;
   EXPECT_EQ(rows(m), 2u);
   EXPECT_EQ(cols(m), 3u);
@@ -16,7 +14,7 @@ TEST(matrix, size)
 
 TEST(matrix, col_row)
 {
-  Matrix<int, 2, 3> m;
+  auto m = matrix<int, 2, 3>();
   m << 1, 2, 3, 4, 5, 6;
   decltype(col(m, 0)) c0, c2;
   c0 << 1, 4; c2 << 3, 6;
@@ -32,18 +30,18 @@ TEST(matrix, col_row)
 TEST(matrix, transpose)
 {
   {
-    Matrix<int, 2, 3> m;
+    auto m = matrix<int, 2, 3>();
     m << 1, 2, 3, 4, 5, 6;
     decltype(transpose(m)) mt;
     mt << 1, 4, 2, 5, 3, 6;
     EXPECT_TRUE(mt == transpose(m));
   }
   {
-    Matrix<int, 2, Dynamic> m;
-    m.resize(2, 4);
+    auto m = matrix<float, 2, Dynamic>();
+    resize(m, 2, 4);
     m << 1, 2, 3, 4, 5, 6, 7, 8;
     decltype(transpose(m)) mt;
-    mt.resize(4, 2);
+    resize(mt, 4, 2);
     mt << 1, 5, 2, 6, 3, 7, 4, 8;
     EXPECT_TRUE(mt == transpose(m));
   }
@@ -51,7 +49,7 @@ TEST(matrix, transpose)
 
 TEST(matrix, inverse)
 {
-  Matrix<float, 2, 2> m, mr;
+  auto m = matrix<float, 2, 2>(), mr = matrix<float, 2, 2>();
   m << 5, 4, 6, 5;
   mr << 5, -4, -6, 5;
   EXPECT_TRUE(mr == inverse(m));
@@ -59,7 +57,7 @@ TEST(matrix, inverse)
 
 TEST(matrix, eigenvalues)
 {
-  Matrix<double, 2, 2> m;
+  auto m = matrix<double, 2, 2>();
   m << 1, 2, 2, 1;
   decltype(eigenvalues(m)) m1;
   m1 << 3.0, -1.0;
@@ -70,7 +68,7 @@ TEST(matrix, eigenvalues)
 
 TEST(matrix, eigenvectors)
 {
-  Matrix<double, 2, 2> m;
+  auto m = matrix<double, 2, 2>();
   m << 1, 2, 2, 1;
   auto m1 = eigenvectors(m);
   double eps = 1e-6;
