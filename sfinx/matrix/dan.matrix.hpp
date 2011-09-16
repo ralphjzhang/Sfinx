@@ -1,7 +1,5 @@
-#include <gtest/gtest.h>
-#include "matrix/eigen.hpp"
-
-using namespace sfinx::matrix;
+/// Common testcases for matrix
+//
 
 TEST(matrix, size)
 {
@@ -37,7 +35,7 @@ TEST(matrix, transpose)
     EXPECT_TRUE(mt == transpose(m));
   }
   {
-    auto m = matrix<float, 2, Dynamic>();
+    auto m = matrix<float, 2, dynamic>();
     resize(m, 2, 4);
     m << 1, 2, 3, 4, 5, 6, 7, 8;
     decltype(transpose(m)) mt;

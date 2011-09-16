@@ -9,7 +9,9 @@ namespace sfinx { namespace matrix {
 //
 using namespace Eigen;
 
-template <typename T, size_t Rows, size_t Cols>
+static const auto dynamic = Dynamic;
+
+template <typename T, int Rows, int Cols>
 auto matrix() -> Matrix<T, Rows, Cols>
 {
   return Matrix<T, Rows, Cols>();

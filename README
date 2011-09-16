@@ -1,0 +1,11 @@
+Sfinx is a library that implements algorithms from Financial Numerical Recipes.
+Sfinx stands for Sfinx FINancial ...
+
+Features:
+1. Cutting edge technology, C++11 compatible
+2. Maximum reusability through generic and functional design
+3. Toolbox, not framework, less object-oriented
+
+// Thoughts
+Should discrete/continuous namespace, instead of function tag?
+
