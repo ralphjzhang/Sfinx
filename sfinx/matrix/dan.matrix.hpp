@@ -60,8 +60,8 @@ TEST(matrix, eigenvalues)
   decltype(eigenvalues(m)) m1;
   m1 << 3.0, -1.0;
   auto m2 = eigenvalues(m);
-  EXPECT_LT(fabs(m1(0) - m2(0)), std::numeric_limits<double>::epsilon() * 10);
-  EXPECT_LT(fabs(m1(1) - m2(1)), std::numeric_limits<double>::epsilon() * 10);
+  EXPECT_DOUBLE_EQ(m1(0), m2(0));
+  EXPECT_DOUBLE_EQ(m1(1), m2(1));
 }
 
 TEST(matrix, eigenvectors)
@@ -70,9 +70,9 @@ TEST(matrix, eigenvectors)
   m << 1, 2, 2, 1;
   auto m1 = eigenvectors(m);
   double eps = 1e-6;
-  EXPECT_LT(fabs(m1(0, 0) + 0.707107), eps);
-  EXPECT_LT(fabs(m1(0, 1) + 0.707107), eps);
-  EXPECT_LT(fabs(m1(1, 0) - 0.707107), eps);
-  EXPECT_LT(fabs(m1(1, 1) + 0.707107), eps);
+  EXPECT_NEAR(m1(0, 0), -0.707107, eps);
+  EXPECT_NEAR(m1(0, 1), -0.707107, eps);
+  EXPECT_NEAR(m1(1, 0), 0.707107, eps);
+  EXPECT_NEAR(m1(1, 1), -0.707107, eps);
 }
 

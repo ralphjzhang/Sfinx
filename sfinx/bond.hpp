@@ -2,7 +2,7 @@
 #include <functional>
 #include "discount_factor.hpp"
 #include "pv.hpp"
-#include "bisect.hpp"
+#include "solver.hpp"
 #include "math.hpp"
 
 namespace sfinx {
@@ -20,7 +20,7 @@ double ytm(T const& times, U const& amounts, double price)
   auto range = std::make_pair(0.0, 1.0);
   double eps = 1.0e-5;
   auto f = [&](double r){ return price - pv<F>(times, amounts, r); };
-  auto res = bisect(f, range, eps);
+  auto res = solver::bisection(f, range, eps);
   return res.second <= eps ? res.first : std::numeric_limits<double>::quiet_NaN();
 }
 

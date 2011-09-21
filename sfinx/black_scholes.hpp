@@ -2,44 +2,9 @@
 #include <type_traits>
 #include <cmath>
 #include "math.hpp"
+#include "option_aux.hpp"
 
 namespace sfinx { namespace option {
-
-namespace aux {
-
-inline double d1(double S, double K, double T, double r, double v)
-{
-  return (log(S / K) + (r + v * v / 2) * T) / (v * sqrt(T));
-}
-
-inline double d2(double d1, double T, double v)
-{
-  return d1 - v * sqrt(T);
-}
-
-inline double d2(double S, double K, double T, double r, double v)
-{
-  return d2(d1(S, K, T, r, v), T, v);
-}
-
-inline std::pair<double, double> d(double S, double K, double T, double r, double v)
-{
-  double d_1 = d1(S, K, T, r, v);
-  return std::make_pair(d_1, d2(d_1, T, v));
-}
-
-inline double call(double d1, double d2, double S, double K, double T, double r)
-{
-  return S * normal_cdf(d1) - K * exp(-r * T) * normal_cdf(d2);
-}
-
-inline double put(double d1, double d2, double S, double K, double T, double r)
-{
-  return K * exp(-r * T) * normal_cdf(-d2) - S * normal_cdf(-d1);
-}
-
-
-} // namespace aux
 
 enum class Type 
 {
@@ -51,114 +16,156 @@ enum class Exercise
   European, American
 };
 
-template <Type type = Type::Both>
-auto black_scholes(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<type == Type::Both, std::pair<double, double>>::type
+} // namespace option
+
+namespace black_scholes {
+
+/**
+ * Call option value 
+ **/
+template <typename Num>
+inline Num call(Num d1, Num d2, Num S, Num K, Num T, Num r)
 {
-  auto d = aux::d(S, K, T, r, v);
-  double call = aux::call(d.first, d.second, S, K, T, r), put = aux::put(d.first, d.second, S, K, T, r);
-  return std::make_pair(call, put);
+  return S * normal_cdf(d1) - K * exp(-r * T) * normal_cdf(d2);
 }
 
-template <Type type>
-auto black_scholes(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<type == Type::Call, double>::type
+/**
+ * Call option value with payout q
+ **/
+template <typename Num>
+inline Num call(Num d1, Num d2, Num S, Num K, Num T, Num r, Num q)
 {
-  auto d = aux::d(S, K, T, r, v);
-  return aux::call(d.first, d.second, S, K, T, r);
+  return call(d1, d2, S * exp(-q * T), K, T, r);
 }
 
-template <Type type>
-auto black_scholes(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<type == Type::Put, double>::type
+/**
+ * Put option value
+ **/
+template <typename Num>
+inline Num put(Num d1, Num d2, Num S, Num K, Num T, Num r)
 {
-  auto d = aux::d(S, K, T, r, v);
-  return aux::put(d.first, d.second, S, K, T, r);
+  return K * exp(-r * T) * normal_cdf(-d2) - S * normal_cdf(-d1);
 }
 
-template <Type type>
-auto delta(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<type == Type::Call, double>::type
+/**
+ * Put option value with payout q
+ **/
+template <typename Num>
+inline Num put(Num d1, Num d2, Num S, Num K, Num T, Num r, Num q)
+{
+  return put(d1, d2, S * exp(-q * T), K, T, r);
+}
+
+template <option::Type type, typename Num>
+auto value(Num S, Num K, Num T, Num r, Num v)
+  -> typename std::enable_if<type == option::Type::Both, std::pair<Num, Num>>::type
+{
+  auto d = aux::d(S, K, T, r, v);
+  Num c = call(d.first, d.second, S, K, T, r), p = put(d.first, d.second, S, K, T, r);
+  return std::make_pair(c, p);
+}
+
+template <option::Type type, typename Num>
+auto value(Num S, Num K, Num T, Num r, Num v)
+  -> typename std::enable_if<type == option::Type::Call, Num>::type
+{
+  auto d = aux::d(S, K, T, r, v);
+  return call(d.first, d.second, S, K, T, r);
+}
+
+template <option::Type type, typename Num>
+auto value(Num S, Num K, Num T, Num r, Num v)
+  -> typename std::enable_if<type == option::Type::Put, Num>::type
+{
+  auto d = aux::d(S, K, T, r, v);
+  return put(d.first, d.second, S, K, T, r);
+}
+
+template <option::Type type, typename Num>
+auto delta(Num S, Num K, Num T, Num r, Num v)
+  -> typename std::enable_if<type == option::Type::Call, Num>::type
 {
   return normal_cdf(aux::d1(S, K, T, r, v));
 }
 
-template <Type type>
-auto delta(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<type == Type::Put, double>::type
+template <option::Type type, typename Num>
+auto delta(Num S, Num K, Num T, Num r, Num v)
+  -> typename std::enable_if<type == option::Type::Put, Num>::type
 {
   return normal_cdf(aux::d1(S, K, T, r, v)) - 1;
 }
 
-template <Type type>
-auto delta(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<type == Type::Both, std::pair<double, double>>::type
+template <option::Type type, typename Num>
+auto delta(Num S, Num K, Num T, Num r, Num v)
+  -> typename std::enable_if<type == option::Type::Both, std::pair<Num, Num>>::type
 {
-  double d = delta<Type::Call>(S, K, T, r, v);
+  Num d = delta<option::Type::Call>(S, K, T, r, v);
   return std::make_pair(d, d - 1);
 }
 
-inline double gamma(double S, double K, double T, double r, double v)
+template <typename Num>
+inline Num gamma(Num S, Num K, Num T, Num r, Num v)
 {
   return normal_pdf(aux::d1(S, K, T, r, v)) / (S * v * sqrt(T));
 }
 
-inline double vega(double S, double K, double T, double r, double v)
+template <typename Num>
+inline Num vega(Num S, Num K, Num T, Num r, Num v)
 {
   return S * normal_pdf(aux::d1(S, K, T, r, v)) * sqrt(T);
 }
 
-template <Type type>
-auto theta(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<type == Type::Call, double>::type
+template <option::Type type, typename Num>
+auto theta(Num S, Num K, Num T, Num r, Num v)
+  -> typename std::enable_if<type == option::Type::Call, Num>::type
 {
-  double d1 = aux::d1(S, K, T, r, v);
-  double d2 = aux::d2(d1, T, v);
+  Num d1 = aux::d1(S, K, T, r, v);
+  Num d2 = aux::d2(d1, T, v);
   return -S * normal_pdf(d1) * v / (2 * sqrt(T)) - r * K * exp(-r * T) * normal_cdf(d2);
 }
 
-template <Type type>
-auto theta(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<type == Type::Put, double>::type
+template <option::Type type, typename Num>
+auto theta(Num S, Num K, Num T, Num r, Num v)
+  -> typename std::enable_if<type == option::Type::Put, Num>::type
 {
-  double d1 = aux::d1(S, K, T, r, v);
-  double d2 = aux::d2(d1, T, v);
+  Num d1 = aux::d1(S, K, T, r, v);
+  Num d2 = aux::d2(d1, T, v);
   return -S * normal_pdf(d1) * v / (2 * sqrt(T)) + r * K * exp(-r * T) * normal_cdf(-d2);
 }
 
-template <Type type>
-auto theta(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<type == Type::Both, std::pair<double, double>>::type
+template <option::Type type, typename Num>
+auto theta(Num S, Num K, Num T, Num r, Num v)
+  -> typename std::enable_if<type == option::Type::Both, std::pair<Num, Num>>::type
 {
-  double d1 = aux::d1(S, K, T, r, v);
-  double d2 = aux::d2(d1, T, v);
-  double t1 = -S * normal_pdf(d1) * v / (2 * sqrt(T)), t2 = r * K * exp(-r * T);
+  Num d1 = aux::d1(S, K, T, r, v);
+  Num d2 = aux::d2(d1, T, v);
+  Num t1 = -S * normal_pdf(d1) * v / (2 * sqrt(T)), t2 = r * K * exp(-r * T);
   return std::make_pair(t1 - t2 * normal_cdf(d2), t1 + t2 * normal_cdf(-d2));
 }
 
-template <Type type>
-auto rho(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<type == Type::Call, double>::type
+template <option::Type type, typename Num>
+auto rho(Num S, Num K, Num T, Num r, Num v)
+  -> typename std::enable_if<type == option::Type::Call, Num>::type
 {
   return K * T * exp(-r * T) * normal_cdf(aux::d2(S, K, T, r, v));
 }
 
-template <Type type>
-auto rho(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<type == Type::Put, double>::type
+template <option::Type type, typename Num>
+auto rho(Num S, Num K, Num T, Num r, Num v)
+  -> typename std::enable_if<type == option::Type::Put, Num>::type
 {
   return -K * T * exp(-r * T) * normal_cdf(-aux::d2(S, K, T, r, v));
 }
 
-template <Type type>
-auto rho(double S, double K, double T, double r, double v)
-  -> typename std::enable_if<type == Type::Both, std::pair<double, double>>::type
+template <option::Type type, typename Num>
+auto rho(Num S, Num K, Num T, Num r, Num v)
+  -> typename std::enable_if<type == option::Type::Both, std::pair<Num, Num>>::type
 {
-  double d2 = aux::d2(S, K, T, r, v);
-  double t = K * T * exp(-r * T);
+  Num d2 = aux::d2(S, K, T, r, v);
+  Num t = K * T * exp(-r * T);
   return std::make_pair(t * normal_cdf(d2), -t * normal_cdf(-d2));
 }
 
-} // namespace option
+} // namespace black_scholes
 } // namespace sfinx
 

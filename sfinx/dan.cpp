@@ -5,7 +5,6 @@
 #include "discount_factor.hpp"
 #include "math.hpp"
 #include "pv.hpp"
-#include "bisect.hpp"
 #include "irr.hpp"
 #include "bond.hpp"
 #include "black_scholes.hpp"
@@ -78,27 +77,6 @@ TEST(sfinx, pv)
   }
 }
 
-TEST(sfinx, bisect)
-{
-  double eps = 0.00001;
-  auto f = [](double x) { return x * x - 4; };
-  double root = bisect(f, std::array<double, 2>{{ 0.0, 10.0 }}, eps).first;
-  EXPECT_LT(fabs(root - 2.0), eps);
-  root = bisect(f, std::make_pair(1.0, 3.0), eps).first;
-  EXPECT_LT(fabs(root - 2.0), eps);
-  root = bisect(f, std::make_tuple(3.0, 1.0), eps).first;
-  EXPECT_LT(fabs(root - 2.0), eps);
-
-  // This range contains no root
-  auto res = bisect(f, std::make_tuple(3.0, 10.0), eps);
-  EXPECT_EQ(res.first, 3.0);
-  EXPECT_EQ(res.second, 5.0);
-  // This range contains no root
-  res = bisect(f, std::make_tuple(10.0, 3.0), eps);
-  EXPECT_EQ(res.first, 3.0);
-  EXPECT_EQ(res.second, 5.0);
-}
-
 TEST(sfinx, irr)
 {
   double eps = 1.0e-5;
@@ -156,24 +134,6 @@ TEST(sfinx, bond_convexity)
   double amounts[] = { 10.0, 10.0, 110.0 };
   EXPECT_LT(fabs(bond_convexity<Flow::Discrete>(times, amounts, 0.09) - 8.93248), eps);
   EXPECT_LT(fabs(bond_convexity<Flow::Continuous>(times, amounts, 0.09) - 7.86779), eps);
-}
-
-TEST(sfinx, black_scholes)
-{
-  using namespace sfinx::option;
-  double S = 45, K = 50, T = 0.50, r = 0.01, v = 0.20;
-  double eps = 1.0e-4;
-  EXPECT_LT(fabs(black_scholes<Type::Call>(S, K, T, r, v) - 0.9392), eps);
-  EXPECT_LT(fabs(black_scholes<Type::Put>(S, K, T, r, v) - 5.6898), eps);
-  EXPECT_LT(fabs(delta<Type::Call>(S, K, T, r, v) - 0.2615), eps);
-  EXPECT_LT(fabs(delta<Type::Put>(S, K, T, r, v) - -0.7385), eps);
-  EXPECT_LT(fabs(gamma(S, K, T, r, v) - 0.0511), eps);
-
-  EXPECT_LT(fabs(vega(S, K, T, r, v) - 10.3504), eps);
-  EXPECT_LT(fabs(theta<Type::Call>(S, K, T, r, v) - -2.1783), eps);
-  EXPECT_LT(fabs(theta<Type::Put>(S, K, T, r, v) - -1.6809), eps);
-  EXPECT_LT(fabs(rho<Type::Call>(S, K, T, r, v) - 5.4126), eps);
-  EXPECT_LT(fabs(rho<Type::Put>(S, K, T, r, v) - -19.4628), eps);
 }
 
 TEST(sfinx, nelson_siegel)

@@ -38,7 +38,7 @@ auto linear_interpolate(Ret x, X const& xs, Y const& ys)
   return make_pair(Ret(), false);
 }
 
-/*
+/**
  * Error functions, use C99 erfc/erf by default, see if needed to make conditional compile
  *
 inline double erfc(double x)
@@ -46,7 +46,7 @@ inline double erfc(double x)
   double const a1 = -1.26551223, a2 = 1.00002368, a3 = 0.37409196, a4 = 0.09678418, a5 = -0.18628806,
                a6 = 0.27886807, a7 = -1.13520398, a8 = 1.48851587, a9 = -0.82215223, a10 = 0.17087277;
   double ret = 1;
-  double z = fabs(x);
+  double z = abs(x);
   if (z == 0) return ret;
   double t = 1 / (1 + 0.5 * z);
   ret = t * exp((-z * z) + a1 + t * (a2 + t * (a3 + t * (a4 + t * (a5 + t * (a6 + t * (a7 + t * (a8 + 
