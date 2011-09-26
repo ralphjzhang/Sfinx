@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include "black_scholes.hpp"
-#include "baw.hpp"
+#include "barone_adesi_whaley.hpp"
 #include "bjerksund_stensland.hpp"
 
 
@@ -93,6 +93,29 @@ TEST(option, barone_adesi_whaley)
     EXPECT_NEAR(baw::put(S, X, T, r, b, v), 3.3226, eps);
     v = 0.35;
     EXPECT_NEAR(baw::put(S, X, T, r, b, v), 5.8822, eps); //5.8823
+  }
+}
+
+TEST(option, bjerksund_stensland)
+{
+  using namespace sfinx;
+  double eps = 1.0e-4;
+  EXPECT_NEAR(bs93::call(42., 40., 0.75, 0.04, -0.04, 0.35), 5.2704, eps);
+
+  double S = 90, X = 100, r = 0.1, b = 0;
+  {
+    double T = 0.1, v = 0.15;
+    EXPECT_NEAR(bs93::call(S, X, T, r, b, v), 0.0206, eps);
+    v = 0.25;
+    EXPECT_NEAR(bs93::call(S, X, T, r, b, v), 0.3159, eps);
+    v = 0.35;
+    EXPECT_NEAR(bs93::call(S, X, T, r, b, v), 0.9495, eps);
+    T = 0.5, v = 0.15;
+    EXPECT_NEAR(bs93::call(S, X, T, r, b, v), 0.8208, eps);
+    v = 0.25;
+    EXPECT_NEAR(bs93::call(S, X, T, r, b, v), 2.7436, eps);
+    v = 0.35;
+    EXPECT_NEAR(bs93::call(S, X, T, r, b, v), 5.0062, eps);
   }
 }
 
